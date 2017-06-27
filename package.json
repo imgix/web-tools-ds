@@ -1,0 +1,22 @@
+{
+  "name": "web-tools-ds",
+  "version": "0.1.0",
+  "description": "Web-tools plugin and pipelines for reading in data assets in a variety of formats and storing them for use in templates",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jayeb/web-tools-ds"
+  },
+  "author": "Jason Eberle",
+  "license": "BSD",
+  "main": "tools/web-tools-ds.js",
+  "dependencies": {
+    "gulp-data": "^1.2.1",
+    "gulp-marked-json": "^1.0.0",
+    "gulp-util": "^3.0.8",
+    "gulp-yaml": "^1.0.1",
+    "js-data": "^2.10.0",
+    "js-yaml": "^3.8.4",
+    "lodash": "4.6.1",
+    "through2": "^2.0.3"
+  }
+}
