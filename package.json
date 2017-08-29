@@ -10,13 +10,15 @@
   "license": "BSD",
   "main": "tools/web-tools-ds.js",
   "dependencies": {
-    "gulp-data": "^1.2.1",
+    "front-matter": "^2.2.0",
     "gulp-marked-json": "^1.0.0",
     "gulp-util": "^3.0.8",
-    "gulp-yaml": "^1.0.1",
     "js-data": "^2.10.0",
     "js-yaml": "^3.8.4",
     "lodash": "4.6.1",
+    "marked": "^0.3.6",
+    "reporter-plus": "git://github.com/jayeb/reporter-plus.git#1.6.0",
+    "stream-combiner": "^0.2.2",
     "through2": "^2.0.3"
   }
 }

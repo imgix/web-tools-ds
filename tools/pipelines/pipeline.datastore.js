@@ -1,36 +1,50 @@
 var _ = require('lodash'),
+    path = require('path'),
     gutil = require('gulp-util'),
     through = require('through2'),
     combine = require('stream-combiner');
 
 module.exports = function setupDatastorePipeline(gulp) {
-  function storeData(options)
+  function storeData(options) {
     return through.obj(function transform(file, encoding, callback) {
-      var resource;
+      var model,
+          fileName = path.basename(file.path, path.extname(file.path)),
+          key;
 
-      if (_.isString(options.resource)) {
-        resource = gulp.DS.resources[options.resource];
+      if (_.isString(options.model)) {
+        model = gulp.ds.definitions[options.model];
 
-        if (!resource) {
-          throw new gutil.PluginError('storeData', 'No such resource: "' + options.resource + '"');
+        if (!model) {
+          throw new gutil.PluginError('storeData', 'No such model: "' + options.model + '"');
         }
 
         if (options.filenameIsID) {
-          file.data[resource.idAttribute] = file.name;
+          file.data[model.idAttribute] = fileName;
         }
 
-        gulp.DS.inject(options.resource, file.data);
+        gulp.ds.inject(options.model, file.data);
       } else {
-        gulp.dataStore[file.name] = file.data;
+        if (_.isFunction(options.keyAs)) {
+          key = options.keyAs(file.data);
+        } else {
+          key = options.keyAs;
+        }
+
+        if (!_.isString(key)) {
+          key = fileName;
+        }
+
+        _.set(gulp.ds, key, file.data);
       }
 
       callback(null, file);
     });
-  }
+  };
 
   return function datastorePipeline(options) {
     options = _.defaultsDeep({}, options, {
-      filenameIsID: true
+      filenameIsID: true,
+      keyAs: null
     });
 
     return combine(_.compact([

@@ -1,9 +1,24 @@
 var _ = require('lodash'),
+    path = require('path'),
     combine = require('stream-combiner'),
-    yamlLint = require('./misc/yamllint.js'),
+    through = require('through2'),
+    yaml = require('js-yaml'),
+    yamlLint = require('../misc/yamllint.js'),
     yamlLintReporter = require('reporter-plus/yamllint');
 
 module.exports = function setupYAMLReaderPipeline(gulp) {
+  function parseYAML(options) {
+    return through.obj(function transform(file, encoding, callback) {
+      var yamlOptions = _.defaults(options, {
+        filename: path.basename(file.path)
+      });
+
+      file.data = yaml.load(file.contents.toString(), yamlOptions);
+
+      callback(null, file);
+    });
+  }
+
   return function yamlReaderPipeline(options) {
     options = _.defaultsDeep({}, options, {
       doCheck: true,
@@ -19,10 +34,7 @@ module.exports = function setupYAMLReaderPipeline(gulp) {
       options.doCheck && yamlLint.reporter(yamlLintReporter),
 
       // Processing pipeline
-      options.doProcessing && gulpPlugins.yaml(options.inputOptions),
-      options.doProcessing && gulpPlugins.data(function getFromFile(file) {
-          return require(file.path);
-        })
+      options.doProcessing && parseYAML(options.inputOptions)
     ]));
   };
 };
