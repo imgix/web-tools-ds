@@ -13,6 +13,7 @@ module.exports = function setUpDS(gulp) {
 
   if (!!dsConfig.models) {
     DS = new JSData.DS({
+      linkRelations: true,
       beforeCreate: abortAsync,
       beforeUpdate: abortAsync,
       beforeDestroy: abortAsync,
