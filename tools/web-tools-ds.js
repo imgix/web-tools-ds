@@ -21,7 +21,9 @@ module.exports = function setUpDS(gulp) {
     });
 
     // Define all models
-    _.each(dsConfig.models, function defineModel(model) {
+    _.each(dsConfig.models, function defineModel(modelConstructor) {
+      var model = modelConstructor(DS);
+
       DS.defineResource(model);
     });
 
