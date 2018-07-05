@@ -1,6 +1,6 @@
 {
   "name": "web-tools-ds",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Web-tools plugin and pipelines for reading in data assets in a variety of formats and storing them for use in templates",
   "repository": {
     "type": "git",
