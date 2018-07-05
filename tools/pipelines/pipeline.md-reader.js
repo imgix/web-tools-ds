@@ -6,12 +6,18 @@ var _ = require('lodash'),
     marked = require('marked');
 
 module.exports = function setupMarkdownReaderPipeline(gulp) {
-  function parseMarkdown(options) {
+  function parseMarkdown(options, rendererOverrides) {
+    var renderer = new marked.Renderer();
+
+    _.assign(renderer, rendererOverrides);
+
     return through.obj(function transform(file, encoding, callback) {
       var parsedData = frontMatter(file.contents.toString()),
           attributes = _.get(parsedData, 'attributes', {});
 
-      attributes.body = marked(parsedData.body, options);
+      attributes.body = marked(parsedData.body, _.merge({}, options, {
+        renderer: renderer
+      }));
 
       file.data = attributes;
 
@@ -23,12 +29,13 @@ module.exports = function setupMarkdownReaderPipeline(gulp) {
     options = _.defaultsDeep({}, options, {
       doProcessing: true,
 
-      inputOptions: {}
+      inputOptions: {},
+      rendererOverrides: {}
     });
 
     return combine(_.compact([
       // Processing pipeline
-      options.doProcessing && parseMarkdown(options.inputOptions)
+      options.doProcessing && parseMarkdown(options.inputOptions, options.rendererOverrides)
     ]));
   };
 };
