@@ -6,18 +6,21 @@ var _ = require('lodash'),
 
 module.exports = function setupDatastorePipeline(gulp) {
   function storeData(options) {
+    var model;
+
+    if (_.isString(options.model)) {
+      model = gulp.ds.definitions[options.model];
+
+      if (!model) {
+        throw new gutil.PluginError('storeData', 'No such model: "' + options.model + '"');
+      }
+    }
+
     return through.obj(function transform(file, encoding, callback) {
-      var model,
-          fileName = path.basename(file.path, path.extname(file.path)),
+      var fileName = path.basename(file.path, path.extname(file.path)),
           key;
 
-      if (_.isString(options.model)) {
-        model = gulp.ds.definitions[options.model];
-
-        if (!model) {
-          throw new gutil.PluginError('storeData', 'No such model: "' + options.model + '"');
-        }
-
+      if (model) {
         if (options.filenameIsID) {
           file.data[model.idAttribute] = fileName;
         }
