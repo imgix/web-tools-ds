@@ -12,13 +12,13 @@ module.exports = function setUpDS(gulp) {
   }
 
   if (!!dsConfig.models) {
-    DS = new JSData.DS({
+    DS = new JSData.DS(_.assign({
       linkRelations: true,
       beforeCreate: abortAsync,
       beforeUpdate: abortAsync,
       beforeDestroy: abortAsync,
       beforeFind: abortAsync
-    });
+    }, dsConfig.settings));
 
     // Define all models
     _.each(dsConfig.models, function defineModel(modelConstructor) {
