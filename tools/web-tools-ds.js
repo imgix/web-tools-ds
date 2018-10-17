@@ -36,4 +36,5 @@ module.exports = function setUpDS(gulp) {
   gulp.pipelineCache.put('yaml-reader', require('./pipelines/pipeline.yaml-reader.js'));
   gulp.pipelineCache.put('md-reader', require('./pipelines/pipeline.md-reader.js'));
   gulp.pipelineCache.put('datastore', require('./pipelines/pipeline.datastore.js'));
+  gulp.pipelineCache.put('datastore-computeAll', require('./pipelines/pipeline.datastore-compute-all.js'));
 };
