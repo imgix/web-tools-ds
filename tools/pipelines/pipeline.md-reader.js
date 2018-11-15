@@ -7,7 +7,18 @@ var _ = require('lodash'),
 
 module.exports = function setupMarkdownReaderPipeline(gulp) {
   function parseMarkdown(options, rendererOverrides) {
-    var renderer = new marked.Renderer();
+    var renderer = new marked.Renderer(),
+        overrideFunctions;
+
+    overrideFunctions = _.mapValues(rendererOverrides, function createOverrideFunction(newRenderFunction, name) {
+      var originalFunction = _.get(renderer, name);
+
+      if (_.isFunction(originalFunction)) {
+        return _.partialRight(newRenderFunction, originalFunction);
+      } else {
+        return newRenderFunction;
+      }
+    });
 
     _.assign(renderer, rendererOverrides);
 
