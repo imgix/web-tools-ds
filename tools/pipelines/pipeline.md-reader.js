@@ -14,13 +14,13 @@ module.exports = function setupMarkdownReaderPipeline(gulp) {
       var originalFunction = _.get(renderer, name);
 
       if (_.isFunction(originalFunction)) {
-        return _.partialRight(newRenderFunction, originalFunction);
+        return _.partialRight(newRenderFunction, originalFunction).bind(renderer);
       } else {
         return newRenderFunction;
       }
     });
 
-    _.assign(renderer, rendererOverrides);
+    _.assign(renderer, overrideFunctions);
 
     return through.obj(function transform(file, encoding, callback) {
       var parsedData = frontMatter(file.contents.toString()),
