@@ -14,7 +14,7 @@ module.exports = function setupMarkdownReaderPipeline(gulp) {
       var originalFunction = _.get(renderer, name);
 
       if (_.isFunction(originalFunction)) {
-        return _.partialRight(newRenderFunction, originalFunction).bind(renderer);
+        return _.partialRight(newRenderFunction, originalFunction.bind(renderer));
       } else {
         return newRenderFunction;
       }
