@@ -3,32 +3,28 @@ var _ = require('lodash'),
     combine = require('stream-combiner'),
     through = require('through2'),
     frontMatter = require('front-matter'),
-    marked = require('marked');
+    showdown = require('showdown');
 
 module.exports = function setupMarkdownReaderPipeline(gulp) {
-  function parseMarkdown(options, rendererOverrides) {
-    var renderer = new marked.Renderer(),
-        overrideFunctions;
+  function parseMarkdown(options, extensions) {
+    var converter,
+        optionsWithExtensions;
 
-    overrideFunctions = _.mapValues(rendererOverrides, function createOverrideFunction(newRenderFunction, name) {
-      var originalFunction = _.get(renderer, name);
-
-      if (_.isFunction(originalFunction)) {
-        return _.partialRight(newRenderFunction, originalFunction.bind(renderer));
-      } else {
-        return newRenderFunction;
-      }
+    _.each(extensions, function applyExtenstion(config, name) {
+      showdown.extension(name, _.constant([config]));
     });
 
-    _.assign(renderer, overrideFunctions);
+    optionsWithExtensions = _.merge(options, {
+      extensions: _.keys(extensions)
+    });
+
+    converter = new showdown.Converter(optionsWithExtensions);
 
     return through.obj(function transform(file, encoding, callback) {
       var parsedData = frontMatter(file.contents.toString()),
           attributes = _.get(parsedData, 'attributes', {});
 
-      attributes.body = marked(parsedData.body, _.merge({}, options, {
-        renderer: renderer
-      }));
+      attributes.body = converter.makeHtml(parsedData.body);
 
       file.data = attributes;
 
@@ -41,12 +37,12 @@ module.exports = function setupMarkdownReaderPipeline(gulp) {
       doProcessing: true,
 
       inputOptions: {},
-      rendererOverrides: {}
+      markdownExtensions: {}
     });
 
     return combine(_.compact([
       // Processing pipeline
-      options.doProcessing && parseMarkdown(options.inputOptions, options.rendererOverrides)
+      options.doProcessing && parseMarkdown(options.inputOptions, options.markdownExtensions)
     ]));
   };
 };

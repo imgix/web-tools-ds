@@ -16,8 +16,8 @@
     "js-data": "^2.10.0",
     "js-yaml": "^3.8.4",
     "lodash": "4.6.1",
-    "marked": "^0.3.6",
     "reporter-plus": "git://github.com/jayeb/reporter-plus.git#1.6.0",
+    "showdown": "^1.9.0",
     "stream-combiner": "^0.2.2",
     "through2": "^2.0.3"
   }
