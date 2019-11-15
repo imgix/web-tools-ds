@@ -14,10 +14,45 @@ module.exports = function setUpDS(gulp) {
   if (!!dsConfig.models) {
     DS = new JSData.DS(_.assign({
       linkRelations: true,
+      relationsEnumerable: true,
       beforeCreate: abortAsync,
       beforeUpdate: abortAsync,
       beforeDestroy: abortAsync,
-      beforeFind: abortAsync
+      beforeFind: abortAsync,
+      afterInject: function (resource, items) {
+          var resourceClass;
+
+          resource = DS.definitions[resource.name];
+          resourceClass = resource[resource.class];
+
+          if (!_.isArray(items)) {
+            items = [items];
+          }
+
+          _.chain(items)
+            .castArray()
+            .compact()
+            .each(function updateItem(item) {
+                // Reference the resource
+                if (!item._resource) {
+                  Object.defineProperty(item, '_resource', {
+                    value: resource
+                  });
+                }
+
+                // Define getters for each enumerable relationship
+                _.each(resource.relationList, function addEnumerableRelations(relationDefinition) {
+                  var objectProps;
+
+                  if (_.isUndefined(relationDefinition.enumerable) ? resource.relationsEnumerable : relationDefinition.enumerable) {
+                    objectProps = Object.getOwnPropertyDescriptor(resourceClass.prototype, relationDefinition.localField);
+
+                    Object.defineProperty(item, relationDefinition.localField, objectProps);
+                  }
+                });
+              })
+            .value();
+        }
     }, dsConfig.settings));
 
     // Define all models
